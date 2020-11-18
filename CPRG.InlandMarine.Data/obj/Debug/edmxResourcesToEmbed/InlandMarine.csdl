@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="MarinaModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Customer">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="FirstName" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="LastName" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="Phone" Type="String" MaxLength="14" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="City" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+    <NavigationProperty Name="Leases" Relationship="Self.FK_LeaseCustomer" FromRole="Customer" ToRole="Lease" />
+  </EntityType>
+  <EntityType Name="Dock">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="WaterService" Type="Boolean" Nullable="false" />
+    <Property Name="ElectricalService" Type="Boolean" Nullable="false" />
+    <NavigationProperty Name="Slips" Relationship="Self.FK_SlipDock" FromRole="Dock" ToRole="Slip" />
+  </EntityType>
+  <EntityType Name="Lease">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="SlipID" Type="Int32" Nullable="false" />
+    <Property Name="CustomerID" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Customer" Relationship="Self.FK_LeaseCustomer" FromRole="Lease" ToRole="Customer" />
+    <NavigationProperty Name="Slip" Relationship="Self.FK_LeaseSlip" FromRole="Lease" ToRole="Slip" />
+  </EntityType>
+  <EntityType Name="Slip">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Width" Type="Int32" Nullable="false" />
+    <Property Name="Length" Type="Int32" Nullable="false" />
+    <Property Name="DockID" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Dock" Relationship="Self.FK_SlipDock" FromRole="Slip" ToRole="Dock" />
+    <NavigationProperty Name="Leases" Relationship="Self.FK_LeaseSlip" FromRole="Slip" ToRole="Lease" />
+  </EntityType>
+  <Association Name="FK_LeaseCustomer">
+    <End Role="Customer" Type="Self.Customer" Multiplicity="1" />
+    <End Role="Lease" Type="Self.Lease" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Customer">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Lease">
+        <PropertyRef Name="CustomerID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_SlipDock">
+    <End Role="Dock" Type="Self.Dock" Multiplicity="1" />
+    <End Role="Slip" Type="Self.Slip" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Dock">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Slip">
+        <PropertyRef Name="DockID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_LeaseSlip">
+    <End Role="Slip" Type="Self.Slip" Multiplicity="1" />
+    <End Role="Lease" Type="Self.Lease" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Slip">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Lease">
+        <PropertyRef Name="SlipID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="MarinaEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Customers" EntityType="Self.Customer" />
+    <EntitySet Name="Docks" EntityType="Self.Dock" />
+    <EntitySet Name="Leases" EntityType="Self.Lease" />
+    <EntitySet Name="Slips" EntityType="Self.Slip" />
+    <AssociationSet Name="FK_LeaseCustomer" Association="Self.FK_LeaseCustomer">
+      <End Role="Customer" EntitySet="Customers" />
+      <End Role="Lease" EntitySet="Leases" />
+    </AssociationSet>
+    <AssociationSet Name="FK_SlipDock" Association="Self.FK_SlipDock">
+      <End Role="Dock" EntitySet="Docks" />
+      <End Role="Slip" EntitySet="Slips" />
+    </AssociationSet>
+    <AssociationSet Name="FK_LeaseSlip" Association="Self.FK_LeaseSlip">
+      <End Role="Slip" EntitySet="Slips" />
+      <End Role="Lease" EntitySet="Leases" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>
